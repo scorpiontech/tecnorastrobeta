@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, MapPin, Phone } from "lucide-react";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,8 +61,8 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span className="text-sm">(11) 99999-9999</span>
             </a>
-            <Button variant="hero" size="default">
-              Rastreie Agora
+            <Button variant="hero" size="default" asChild>
+              <Link to="/pre-cadastro">Pré-Cadastro</Link>
             </Button>
           </motion.div>
 
@@ -96,8 +97,8 @@ const Header = () => {
                     {link.name}
                   </a>
                 ))}
-                <Button variant="hero" size="lg" className="mt-4">
-                  Rastreie Agora
+                <Button variant="hero" size="lg" className="mt-4" asChild>
+                  <Link to="/pre-cadastro" onClick={() => setIsMenuOpen(false)}>Pré-Cadastro</Link>
                 </Button>
               </div>
             </motion.nav>
