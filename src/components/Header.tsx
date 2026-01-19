@@ -12,6 +12,7 @@ const Header = () => {
     { name: "Serviços", href: "#servicos" },
     { name: "Como Funciona", href: "#como-funciona" },
     { name: "Por Que Escolher", href: "#porque" },
+    { name: "Planos", href: "/planos", isRoute: true },
     { name: "Contato", href: "#contato" },
   ];
 
@@ -37,16 +38,32 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link, index) => (
-              <motion.a
-                key={link.name}
-                href={link.href}
-                className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                {link.name}
-              </motion.a>
+              link.isRoute ? (
+                <motion.div
+                  key={link.name}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
+              ) : (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  {link.name}
+                </motion.a>
+              )
             ))}
           </nav>
 
@@ -88,14 +105,25 @@ const Header = () => {
             >
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.name}
-                  </a>
+                  link.isRoute ? (
+                    <Link
+                      key={link.name}
+                      to={link.href}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a
+                      key={link.name}
+                      href={link.href}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.name}
+                    </a>
+                  )
                 ))}
                 <Button variant="hero" size="lg" className="mt-4" asChild>
                   <Link to="/pre-cadastro" onClick={() => setIsMenuOpen(false)}>Pré-Cadastro</Link>
