@@ -57,6 +57,7 @@ const PreCadastro = () => {
   const { toast } = useToast();
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [buscandoCep, setBuscandoCep] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -110,7 +111,7 @@ const PreCadastro = () => {
     setArquivo(null);
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     if (!arquivo) {
       toast({
         title: "Arquivo obrigatório",
@@ -120,16 +121,70 @@ const PreCadastro = () => {
       return;
     }
 
-    console.log("Form data:", data);
-    console.log("Arquivo:", arquivo);
+    setEnviando(true);
 
-    toast({
-      title: "Pré-cadastro enviado!",
-      description: "Entraremos em contato em breve para confirmar seus dados.",
-    });
+    try {
+      // Convert file to base64
+      const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            const result = reader.result as string;
+            // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+            const base64 = result.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+        });
+      };
 
-    form.reset();
-    setArquivo(null);
+      const arquivoBase64 = await fileToBase64(arquivo);
+
+      const payload = {
+        ...data,
+        arquivo: {
+          name: arquivo.name,
+          type: arquivo.type,
+          data: arquivoBase64,
+        },
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-pre-cadastro`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Erro ao enviar pré-cadastro");
+      }
+
+      toast({
+        title: "Pré-cadastro enviado!",
+        description: "Entraremos em contato em breve para confirmar seus dados.",
+      });
+
+      form.reset();
+      setArquivo(null);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Erro ao enviar",
+        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const formatPhone = (value: string) => {
@@ -613,8 +668,15 @@ const PreCadastro = () => {
                   />
                 </div>
 
-                <Button type="submit" variant="hero" size="lg" className="w-full">
-                  Enviar Pré-Cadastro
+                <Button type="submit" variant="hero" size="lg" className="w-full" disabled={enviando}>
+                  {enviando ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Enviando...
+                    </span>
+                  ) : (
+                    "Enviar Pré-Cadastro"
+                  )}
                 </Button>
               </form>
             </Form>
