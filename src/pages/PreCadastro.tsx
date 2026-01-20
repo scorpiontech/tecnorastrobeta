@@ -56,6 +56,7 @@ type FormData = z.infer<typeof formSchema>;
 const PreCadastro = () => {
   const { toast } = useToast();
   const [arquivo, setArquivo] = useState<File | null>(null);
+  const [buscandoCep, setBuscandoCep] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -150,6 +151,44 @@ const PreCadastro = () => {
   const formatCep = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     return numbers.replace(/(\d{5})(\d{3})/, "$1-$2");
+  };
+
+  const buscarCep = async (cep: string) => {
+    const numbers = cep.replace(/\D/g, "");
+    if (numbers.length !== 8) return;
+
+    setBuscandoCep(true);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${numbers}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        toast({
+          title: "CEP não encontrado",
+          description: "Verifique o CEP digitado e tente novamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      form.setValue("endereco", data.logradouro || "");
+      form.setValue("bairro", data.bairro || "");
+      form.setValue("cidade", data.localidade || "");
+      form.setValue("estado", data.uf || "");
+
+      toast({
+        title: "Endereço encontrado!",
+        description: "Os campos foram preenchidos automaticamente.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao buscar CEP",
+        description: "Não foi possível buscar o endereço. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setBuscandoCep(false);
+    }
   };
 
   return (
@@ -347,12 +386,26 @@ const PreCadastro = () => {
                         <FormItem>
                           <FormLabel>CEP *</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="00000-000"
-                              {...field}
-                              onChange={(e) => field.onChange(formatCep(e.target.value))}
-                              maxLength={9}
-                            />
+                            <div className="relative">
+                              <Input
+                                placeholder="00000-000"
+                                {...field}
+                                onChange={(e) => {
+                                  const formatted = formatCep(e.target.value);
+                                  field.onChange(formatted);
+                                  if (formatted.replace(/\D/g, "").length === 8) {
+                                    buscarCep(formatted);
+                                  }
+                                }}
+                                maxLength={9}
+                                disabled={buscandoCep}
+                              />
+                              {buscandoCep && (
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                </div>
+                              )}
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
