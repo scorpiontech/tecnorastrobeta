@@ -1,8 +1,18 @@
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Send, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(3, "Nome deve ter pelo menos 3 caracteres").max(100, "Nome muito longo"),
+  email: z.string().trim().email("E-mail inválido").max(255, "E-mail muito longo"),
+  phone: z.string().min(14, "Telefone inválido").max(15, "Telefone inválido"),
+  message: z.string().trim().min(10, "Mensagem deve ter pelo menos 10 caracteres").max(1000, "Mensagem muito longa"),
+});
+
+type FormErrors = Partial<Record<keyof z.infer<typeof contactSchema>, string>>;
 
 const Contact = () => {
   const { toast } = useToast();
@@ -13,9 +23,57 @@ const Contact = () => {
     phone: "",
     message: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits.length ? `(${digits}` : "";
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
+  const validateField = useCallback((field: keyof typeof formData, value: string) => {
+    try {
+      contactSchema.shape[field].parse(value);
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setErrors((prev) => ({ ...prev, [field]: err.errors[0]?.message }));
+      }
+    }
+  }, []);
+
+  const handleChange = (field: keyof typeof formData, value: string) => {
+    const newValue = field === "phone" ? formatPhone(value) : value;
+    setFormData((prev) => ({ ...prev, [field]: newValue }));
+    if (touched[field]) {
+      validateField(field, newValue);
+    }
+  };
+
+  const handleBlur = (field: keyof typeof formData) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    validateField(field, formData[field]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all fields
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof FormErrors;
+        if (!fieldErrors[field]) fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      setTouched({ name: true, email: true, phone: true, message: true });
+      return;
+    }
+
     setEnviando(true);
 
     try {
@@ -39,6 +97,8 @@ const Contact = () => {
           description: "Entraremos em contato em breve.",
         });
         setFormData({ name: "", email: "", phone: "", message: "" });
+        setErrors({});
+        setTouched({});
       } else {
         throw new Error(result.error || "Erro ao enviar mensagem");
       }
@@ -161,11 +221,15 @@ const Contact = () => {
                     type="text"
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    onBlur={() => handleBlur("name")}
+                    className={`w-full px-4 py-3 rounded-lg bg-card border ${errors.name && touched.name ? "border-destructive" : "border-border"} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground`}
                     placeholder="Seu nome"
                     required
                   />
+                  {errors.name && touched.name && (
+                    <p className="text-destructive text-sm mt-1">{errors.name}</p>
+                  )}
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -177,11 +241,15 @@ const Contact = () => {
                       type="email"
                       id="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
+                      onChange={(e) => handleChange("email", e.target.value)}
+                      onBlur={() => handleBlur("email")}
+                      className={`w-full px-4 py-3 rounded-lg bg-card border ${errors.email && touched.email ? "border-destructive" : "border-border"} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground`}
                       placeholder="seu@email.com"
                       required
                     />
+                    {errors.email && touched.email && (
+                      <p className="text-destructive text-sm mt-1">{errors.email}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium mb-2">
@@ -191,11 +259,15 @@ const Contact = () => {
                       type="tel"
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground"
+                      onChange={(e) => handleChange("phone", e.target.value)}
+                      onBlur={() => handleBlur("phone")}
+                      className={`w-full px-4 py-3 rounded-lg bg-card border ${errors.phone && touched.phone ? "border-destructive" : "border-border"} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-foreground`}
                       placeholder="(00) 00000-0000"
                       required
                     />
+                    {errors.phone && touched.phone && (
+                      <p className="text-destructive text-sm mt-1">{errors.phone}</p>
+                    )}
                   </div>
                 </div>
 
@@ -207,11 +279,15 @@ const Contact = () => {
                     id="message"
                     rows={4}
                     value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-card border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-foreground"
+                    onChange={(e) => handleChange("message", e.target.value)}
+                    onBlur={() => handleBlur("message")}
+                    className={`w-full px-4 py-3 rounded-lg bg-card border ${errors.message && touched.message ? "border-destructive" : "border-border"} focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none text-foreground`}
                     placeholder="Descreva sua necessidade..."
                     required
                   />
+                  {errors.message && touched.message && (
+                    <p className="text-destructive text-sm mt-1">{errors.message}</p>
+                  )}
                 </div>
 
                 <Button type="submit" variant="hero" size="lg" className="w-full" disabled={enviando}>
