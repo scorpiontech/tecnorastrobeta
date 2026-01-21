@@ -11,7 +11,9 @@ interface PreCadastroData {
   nomeCompleto: string;
   email: string;
   telefone: string;
+  nomeContatoEmergencia: string;
   contatoEmergencia: string;
+  vinculoTitular: string;
   cpfCnpj: string;
   rg: string;
   dataNascimento: string;
@@ -40,6 +42,18 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const data: PreCadastroData = await req.json();
 
+    const formatVinculo = (vinculo: string): string => {
+      const vinculos: Record<string, string> = {
+        marido: "Marido",
+        esposa: "Esposa",
+        pai: "Pai",
+        mae: "Mãe",
+        filho: "Filho(a)",
+        outros: "Outros",
+      };
+      return vinculos[vinculo] || vinculo;
+    };
+
     const client = new SMTPClient({
       connection: {
         hostname: Deno.env.get("SMTP_HOST")!,
@@ -65,12 +79,18 @@ const handler = async (req: Request): Promise<Response> => {
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome Completo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomeCompleto}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.email}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.telefone}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Contato de Emergência:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.contatoEmergencia}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CPF/CNPJ:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.cpfCnpj}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">RG:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.rg}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Data de Nascimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.dataNascimento}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome da Mãe:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomeMae}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome do Pai:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomePai || "Não informado"}</td></tr>
+            </table>
+            
+            <h2 style="color: #d4af37; margin-top: 25px;">Contato de Emergência</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomeContatoEmergencia}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.contatoEmergencia}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vínculo com Titular:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatVinculo(data.vinculoTitular)}</td></tr>
             </table>
             
             <h2 style="color: #d4af37; margin-top: 25px;">Endereço</h2>
