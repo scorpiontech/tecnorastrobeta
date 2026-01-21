@@ -28,17 +28,77 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+// Função para validar CPF
+const validateCPF = (cpf: string): boolean => {
+  const numbers = cpf.replace(/\D/g, "");
+  if (numbers.length !== 11) return false;
+  if (/^(\d)\1+$/.test(numbers)) return false;
+  
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(numbers[i]) * (10 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(numbers[9])) return false;
+  
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(numbers[i]) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(numbers[10])) return false;
+  
+  return true;
+};
+
+// Função para validar CNPJ
+const validateCNPJ = (cnpj: string): boolean => {
+  const numbers = cnpj.replace(/\D/g, "");
+  if (numbers.length !== 14) return false;
+  if (/^(\d)\1+$/.test(numbers)) return false;
+  
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(numbers[i]) * weights1[i];
+  }
+  let remainder = sum % 11;
+  const digit1 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit1 !== parseInt(numbers[12])) return false;
+  
+  sum = 0;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(numbers[i]) * weights2[i];
+  }
+  remainder = sum % 11;
+  const digit2 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit2 !== parseInt(numbers[13])) return false;
+  
+  return true;
+};
+
 const formSchema = z.object({
   nomeCompleto: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   email: z.string().email("Email inválido"),
-  telefone: z.string().min(10, "Telefone inválido"),
-  contatoEmergencia: z.string().min(10, "Contato de emergência inválido"),
-  cpfCnpj: z.string().min(11, "CPF/CNPJ inválido"),
+  telefone: z.string().min(14, "Telefone inválido"),
+  nomeContatoEmergencia: z.string().min(3, "Nome do contato é obrigatório"),
+  contatoEmergencia: z.string().min(14, "Contato de emergência inválido"),
+  vinculoTitular: z.string().min(1, "Selecione o vínculo com o titular"),
+  cpfCnpj: z.string().refine((val) => {
+    const numbers = val.replace(/\D/g, "");
+    if (numbers.length === 11) return validateCPF(val);
+    if (numbers.length === 14) return validateCNPJ(val);
+    return false;
+  }, "CPF ou CNPJ inválido"),
   rg: z.string().min(5, "RG inválido"),
   dataNascimento: z.string().min(1, "Data de nascimento é obrigatória"),
   nomeMae: z.string().min(3, "Nome da mãe deve ter pelo menos 3 caracteres"),
   nomePai: z.string().optional(),
-  cep: z.string().min(8, "CEP inválido"),
+  cep: z.string().min(9, "CEP inválido"),
   endereco: z.string().min(5, "Endereço inválido"),
   numeroCasa: z.string().min(1, "Número é obrigatório"),
   bairro: z.string().min(2, "Bairro inválido"),
@@ -65,7 +125,9 @@ const PreCadastro = () => {
       nomeCompleto: "",
       email: "",
       telefone: "",
+      nomeContatoEmergencia: "",
       contatoEmergencia: "",
+      vinculoTitular: "",
       cpfCnpj: "",
       rg: "",
       dataNascimento: "",
@@ -188,24 +250,34 @@ const PreCadastro = () => {
   };
 
   const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, "");
-    if (numbers.length <= 11) {
-      return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    }
-    return value;
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits.length ? `(${digits}` : "";
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
   const formatCpfCnpj = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 11) {
-      return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+      // CPF: 000.000.000-00
+      if (numbers.length <= 3) return numbers;
+      if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+      if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+      return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
     }
-    return numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+    // CNPJ: 00.000.000/0000-00
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 5) return `${numbers.slice(0, 2)}.${numbers.slice(2)}`;
+    if (numbers.length <= 8) return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}.${numbers.slice(5)}`;
+    if (numbers.length <= 12) return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}.${numbers.slice(5, 8)}/${numbers.slice(8)}`;
+    return `${numbers.slice(0, 2)}.${numbers.slice(2, 5)}.${numbers.slice(5, 8)}/${numbers.slice(8, 12)}-${numbers.slice(12, 14)}`;
   };
 
   const formatCep = (value: string) => {
-    const numbers = value.replace(/\D/g, "");
-    return numbers.replace(/(\d{5})(\d{3})/, "$1-$2");
+    const numbers = value.replace(/\D/g, "").slice(0, 8);
+    if (numbers.length <= 5) return numbers;
+    return `${numbers.slice(0, 5)}-${numbers.slice(5)}`;
   };
 
   const buscarCep = async (cep: string) => {
@@ -334,10 +406,27 @@ const PreCadastro = () => {
 
                     <FormField
                       control={form.control}
+                      name="nomeContatoEmergencia"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome do Contato de Emergência *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Nome completo"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="contatoEmergencia"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contato de Emergência *</FormLabel>
+                          <FormLabel>Telefone de Emergência *</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="(00) 00000-0000"
@@ -346,6 +435,32 @@ const PreCadastro = () => {
                               maxLength={15}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="vinculoTitular"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vínculo com Titular *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o vínculo" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="marido">Marido</SelectItem>
+                              <SelectItem value="esposa">Esposa</SelectItem>
+                              <SelectItem value="pai">Pai</SelectItem>
+                              <SelectItem value="mae">Mãe</SelectItem>
+                              <SelectItem value="filho">Filho(a)</SelectItem>
+                              <SelectItem value="outros">Outros</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
