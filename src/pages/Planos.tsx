@@ -178,7 +178,7 @@ const Planos = () => {
               ))}
             </div>
 
-            {/* Garantias */}
+            {/* Todos os planos incluem */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -186,30 +186,33 @@ const Planos = () => {
               className="mt-16 text-center"
             >
               <div className="bg-card border border-border rounded-2xl p-8 max-w-4xl mx-auto">
-                <h3 className="text-xl font-bold text-foreground mb-6">
-                  Todas as assinaturas incluem:
+                <h3 className="text-xl font-bold text-gradient-gold mb-8">
+                  Todos os planos incluem:
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-primary" />
-                    </div>
-                    <span className="font-semibold text-foreground">Instalação Gratuita</span>
-                    <span className="text-sm text-muted-foreground">Em todo o Brasil</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground">Instalação gratuita</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Zap className="w-6 h-6 text-primary" />
-                    </div>
-                    <span className="font-semibold text-foreground">Sem Fidelidade</span>
-                    <span className="text-sm text-muted-foreground">Cancele quando quiser</span>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground">App iOS e Android</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Star className="w-6 h-6 text-primary" />
-                    </div>
-                    <span className="font-semibold text-foreground">30 Dias Grátis</span>
-                    <span className="text-sm text-muted-foreground">Teste sem compromisso</span>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground">Suporte técnico 24/7</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground">Histórico de 90 dias</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground">Cercas virtuais ilimitadas</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground">Relatórios mensais</span>
                   </div>
                 </div>
               </div>
