@@ -198,9 +198,9 @@ Castanhal - PA, 68743-040<br />
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">E-mail</h4>
-                  <p className="text-muted-foreground">contato@tecnorastro.net.br
-suporte@tecnorastro.net.br<br />
-                    suporte@tecnorastro.com.br
+                  <p className="text-muted-foreground">
+                    contato@tecnorastro.net.br<br />
+                    suporte@tecnorastro.net.br
                   </p>
                 </div>
               </div>
