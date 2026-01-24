@@ -185,9 +185,9 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Telefone</h4>
-                  <p className="text-muted-foreground">(91) 99146-5654
-(91) 99146-5654 (WhatsApp)<br />
-                    (11) 99999-9999 (WhatsApp)
+                  <p className="text-muted-foreground">
+                    (91) 99146-5654<br />
+                    (91) 99146-5654 (WhatsApp)
                   </p>
                 </div>
               </div>
