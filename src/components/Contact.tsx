@@ -172,9 +172,9 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Endereço</h4>
-                  <p className="text-muted-foreground">Travessa Primeiro de Maio, 1723 - Nova Olinda
-Castanhal - PA, 68743-040<br />
-                    São Paulo - SP, 01000-000
+                  <p className="text-muted-foreground">
+                    Travessa Primeiro de Maio, 1723 - Nova Olinda<br />
+                    Castanhal - PA, 68743-040
                   </p>
                 </div>
               </div>
