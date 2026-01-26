@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PreCadastro from "./pages/PreCadastro";
 import Planos from "./pages/Planos";
+import RastreamentoGarantido from "./pages/RastreamentoGarantido";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/pre-cadastro" element={<PreCadastro />} />
           <Route path="/planos" element={<Planos />} />
+          <Route path="/rastreamento-garantido" element={<RastreamentoGarantido />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
