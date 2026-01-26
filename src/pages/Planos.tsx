@@ -186,7 +186,7 @@ const Planos = () => {
               className="mt-16 text-center"
             >
               <div className="bg-card border border-border rounded-2xl p-8 max-w-4xl mx-auto">
-                <h3 className="text-xl font-bold text-gradient-gold mb-8">
+                <h3 className="text-xl font-bold text-primary mb-8">
                   Todos os planos incluem:
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
