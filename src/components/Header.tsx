@@ -71,9 +71,9 @@ const Header = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <a href="tel:+5511999999999" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+            <a href="tel:+5591991465654" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
               <Phone className="w-4 h-4" />
-              <span className="text-sm">(11) 99999-9999</span>
+              <span className="text-sm">(91) 99146-5654</span>
             </a>
             <Button variant="hero" size="default" asChild>
               <Link to="/pre-cadastro">Pré-Cadastro</Link>
