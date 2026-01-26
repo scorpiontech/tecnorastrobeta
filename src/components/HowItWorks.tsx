@@ -95,10 +95,12 @@ const HowItWorks = () => {
             Todos os planos incluem:
           </h3>
           <div className="grid sm:grid-cols-2 gap-4">
-            {["Instalação gratuita", "App iOS e Android", "Suporte técnico 24/7", "Histórico de 90 dias", "Cercas virtuais ilimitadas", "Relatórios mensais"].map(benefit => <div key={benefit} className="flex items-center gap-3">
+            {["Instalação gratuita", "App iOS e Android", "Suporte técnico 24/7", "Histórico de 90 dias", "Cercas virtuais ilimitadas", "Relatórios mensais"].map(benefit => (
+              <div key={benefit} className="flex items-center gap-3">
                 <CircleCheck className="w-5 h-5 text-primary flex-shrink-0" />
-                
-              </div>)}
+                <span className="text-foreground">{benefit}</span>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
