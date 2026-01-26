@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, MapPin, Phone } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,16 +24,12 @@ const Header = () => {
           {/* Logo */}
           <motion.a
             href="#"
-            className="flex items-center gap-2"
+            className="flex items-center"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <MapPin className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-display font-bold">
-              <span className="text-foreground">Tecno</span>
-              <span className="text-gradient-gold">rastro</span>
-            </span>
+            <img src={logo} alt="Tecnorastro" className="h-14 w-auto" />
           </motion.a>
 
           {/* Desktop Navigation */}
