@@ -106,9 +106,20 @@ const formSchema = z.object({
   cidade: z.string().min(2, "Cidade inválida"),
   estado: z.string().min(2, "Estado inválido"),
   diaVencimento: z.string().min(1, "Selecione o dia de vencimento"),
+  vendedor: z.string().min(1, "Selecione o vendedor"),
+  veioPorIndicacao: z.enum(["sim", "nao"], { required_error: "Selecione uma opção" }),
+  quemIndicou: z.string().optional(),
   aceiteLgpd: z.boolean().refine((val) => val === true, {
     message: "Você deve aceitar os termos da LGPD",
   }),
+}).refine((data) => {
+  if (data.veioPorIndicacao === "sim" && (!data.quemIndicou || data.quemIndicou.trim().length < 3)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Informe quem indicou (mínimo 3 caracteres)",
+  path: ["quemIndicou"],
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -141,9 +152,14 @@ const PreCadastro = () => {
       cidade: "",
       estado: "",
       diaVencimento: "",
+      vendedor: "",
+      veioPorIndicacao: undefined,
+      quemIndicou: "",
       aceiteLgpd: false,
     },
   });
+
+  const veioPorIndicacao = form.watch("veioPorIndicacao");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -744,6 +760,74 @@ const PreCadastro = () => {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="vendedor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vendedor *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o vendedor" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Alex">Alex</SelectItem>
+                              <SelectItem value="Thiago">Thiago</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Indicação */}
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-foreground border-b border-border pb-2">
+                    Indicação
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="veioPorIndicacao"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Você veio por indicação? *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione uma opção" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="sim">Sim</SelectItem>
+                              <SelectItem value="nao">Não</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {veioPorIndicacao === "sim" && (
+                      <FormField
+                        control={form.control}
+                        name="quemIndicou"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quem indicou? *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nome de quem indicou" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                 </div>
 
