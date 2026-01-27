@@ -27,6 +27,9 @@ interface PreCadastroData {
   cidade: string;
   estado: string;
   diaVencimento: string;
+  vendedor: string;
+  veioPorIndicacao: string;
+  quemIndicou?: string;
   arquivo?: {
     name: string;
     type: string;
@@ -102,9 +105,16 @@ const handler = async (req: Request): Promise<Response> => {
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Cidade/Estado:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.cidade} - ${data.estado}</td></tr>
             </table>
             
-            <h2 style="color: #d4af37; margin-top: 25px;">Informações de Pagamento</h2>
+            <h2 style="color: #d4af37; margin-top: 25px;">Informações de Pagamento e Vendas</h2>
             <table style="width: 100%; border-collapse: collapse;">
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Dia de Vencimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">Dia ${data.diaVencimento}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vendedor:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.vendedor}</td></tr>
+            </table>
+            
+            <h2 style="color: #d4af37; margin-top: 25px;">Indicação</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Veio por indicação:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.veioPorIndicacao === "sim" ? "Sim" : "Não"}</td></tr>
+              ${data.veioPorIndicacao === "sim" && data.quemIndicou ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Quem indicou:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.quemIndicou}</td></tr>` : ""}
             </table>
             
             <p style="margin-top: 30px; padding: 15px; background-color: #2a2a2a; border-radius: 5px; font-size: 12px; color: #888;">
