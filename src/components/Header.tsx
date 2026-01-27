@@ -2,35 +2,57 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { Button } from "./ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
-    { name: "Início", href: "#inicio" },
-    { name: "Serviços", href: "#servicos" },
-    { name: "Como Funciona", href: "#como-funciona" },
-    { name: "Por Que Escolher", href: "#porque" },
+    { name: "Início", href: "/", isRoute: true },
+    { name: "Serviços", href: "/#servicos", anchor: "servicos" },
+    { name: "Como Funciona", href: "/#como-funciona", anchor: "como-funciona" },
+    { name: "Por Que Escolher", href: "/#porque", anchor: "porque" },
     { name: "Planos", href: "/planos", isRoute: true },
-    { name: "Contato", href: "#contato" },
+    { name: "Contato", href: "/#contato", anchor: "contato" },
   ];
+
+  const handleAnchorClick = (e: React.MouseEvent, anchor: string) => {
+    e.preventDefault();
+    if (location.pathname === "/") {
+      // Already on home, just scroll
+      const element = document.getElementById(anchor);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to home then scroll
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(anchor);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <motion.a
-            href="#"
-            className="flex items-center"
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <img src={logo} alt="Tecnorastro" className="h-14 w-auto" />
-          </motion.a>
+            <Link to="/" className="flex items-center">
+              <img src={logo} alt="Tecnorastro" className="h-14 w-auto" />
+            </Link>
+          </motion.div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
@@ -53,7 +75,8 @@ const Header = () => {
                 <motion.a
                   key={link.name}
                   href={link.href}
-                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium"
+                  onClick={(e) => handleAnchorClick(e, link.anchor!)}
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium cursor-pointer"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -115,8 +138,11 @@ const Header = () => {
                     <a
                       key={link.name}
                       href={link.href}
-                      className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                      onClick={() => setIsMenuOpen(false)}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium py-2 cursor-pointer"
+                      onClick={(e) => {
+                        handleAnchorClick(e, link.anchor!);
+                        setIsMenuOpen(false);
+                      }}
                     >
                       {link.name}
                     </a>
