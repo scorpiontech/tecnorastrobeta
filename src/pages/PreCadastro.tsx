@@ -774,8 +774,11 @@ const PreCadastro = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="Alex">Alex</SelectItem>
-                              <SelectItem value="Thiago">Thiago</SelectItem>
+                              <SelectItem value="Alex Coutinho">Alex Coutinho</SelectItem>
+                              <SelectItem value="Tiago de Aquino">Tiago de Aquino</SelectItem>
+                              <SelectItem value="Wenicios Santos">Wenicios Santos</SelectItem>
+                              <SelectItem value="Ingridy Silva">Ingridy Silva</SelectItem>
+                              <SelectItem value="Luiz Felipe">Luiz Felipe</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
