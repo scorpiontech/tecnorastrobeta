@@ -691,7 +691,7 @@ const PreCadastro = () => {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label>Anexar Documento (PDF ou Imagem) *</Label>
+                      <Label>Anexar Documento do Veículo (PDF ou Imagem) *</Label>
                       <div className="relative">
                         {!arquivo ? (
                           <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-background">
@@ -824,7 +824,7 @@ const PreCadastro = () => {
                           <FormItem>
                             <FormLabel>Quem indicou? *</FormLabel>
                             <FormControl>
-                              <Input placeholder="Nome de quem indicou" {...field} />
+                              <Input placeholder="Nome completo de quem indicou" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
