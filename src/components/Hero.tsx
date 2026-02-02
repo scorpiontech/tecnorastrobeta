@@ -1,8 +1,18 @@
 import { motion } from "framer-motion";
 import { Shield, MapPin, Zap } from "lucide-react";
 import { Button } from "./ui/button";
+import { Link, useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
+  const handleScrollToServicos = () => {
+    const element = document.getElementById("servicos");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section id="inicio" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background Effects */}
@@ -66,11 +76,13 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
           >
-            <Button variant="hero" size="lg" className="min-w-[200px]">
-              <MapPin className="w-5 h-5 mr-2" />
-              Começar Agora
+            <Button variant="hero" size="lg" className="min-w-[200px]" asChild>
+              <Link to="/planos">
+                <MapPin className="w-5 h-5 mr-2" />
+                Começar Agora
+              </Link>
             </Button>
-            <Button variant="heroOutline" size="lg" className="min-w-[200px]">
+            <Button variant="heroOutline" size="lg" className="min-w-[200px]" onClick={handleScrollToServicos}>
               Saiba Mais
             </Button>
           </motion.div>
