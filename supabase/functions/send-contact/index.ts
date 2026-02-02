@@ -13,6 +13,16 @@ interface ContactRequest {
   message: string;
 }
 
+// Função para escapar HTML e garantir texto puro
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -51,14 +61,14 @@ serve(async (req) => {
           
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #555; margin-top: 0;">Dados do Contato</h3>
-            <p><strong>Nome:</strong> ${data.name}</p>
-            <p><strong>E-mail:</strong> ${data.email}</p>
-            <p><strong>Telefone:</strong> ${data.phone}</p>
+            <p><strong>Nome:</strong> ${escapeHtml(data.name)}</p>
+            <p><strong>E-mail:</strong> ${escapeHtml(data.email)}</p>
+            <p><strong>Telefone:</strong> ${escapeHtml(data.phone)}</p>
           </div>
 
           <div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #555; margin-top: 0;">Mensagem</h3>
-            <p style="white-space: pre-wrap;">${data.message}</p>
+            <p style="white-space: pre-wrap;">${escapeHtml(data.message)}</p>
           </div>
 
           <p style="color: #888; font-size: 12px; margin-top: 30px;">
