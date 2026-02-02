@@ -1,7 +1,37 @@
 import { MapPin, Instagram, Facebook, Linkedin, Youtube } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const navLinks = [
+    { name: "Início", href: "/", isRoute: true },
+    { name: "Serviços", href: "/#servicos", anchor: "servicos" },
+    { name: "Como Funciona", href: "/#como-funciona", anchor: "como-funciona" },
+    { name: "Por Que Escolher", href: "/#porque", anchor: "porque" },
+    { name: "Planos", href: "/planos", isRoute: true },
+    { name: "Contato", href: "/#contato", anchor: "contato" },
+  ];
+
+  const handleAnchorClick = (e: React.MouseEvent, anchor: string) => {
+    e.preventDefault();
+    if (location.pathname === "/") {
+      const element = document.getElementById(anchor);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(anchor);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <footer className="py-16 bg-background border-t border-border">
@@ -36,14 +66,24 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4 text-foreground">Links Rápidos</h4>
             <ul className="space-y-3">
-              {["Início", "Serviços", "Como Funciona", "Por Que Escolher", "Contato"].map((link) => (
-                <li key={link}>
-                  <a
-                    href={`#${link.toLowerCase().replace(/ /g, "-")}`}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-300"
-                  >
-                    {link}
-                  </a>
+              {navLinks.map((link) => (
+                <li key={link.name}>
+                  {link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      onClick={(e) => handleAnchorClick(e, link.anchor!)}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 cursor-pointer"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
