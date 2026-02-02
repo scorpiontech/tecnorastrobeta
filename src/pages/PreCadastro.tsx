@@ -228,6 +228,9 @@ const PreCadastro = () => {
         },
       };
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-pre-cadastro`,
         {
@@ -237,10 +240,18 @@ const PreCadastro = () => {
             "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify(payload),
+          signal: controller.signal,
         }
       );
 
-      const result = await response.json();
+      clearTimeout(timeoutId);
+
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error("Erro de comunicação com o servidor. Tente novamente.");
+      }
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || "Erro ao enviar pré-cadastro");
@@ -255,9 +266,17 @@ const PreCadastro = () => {
       setArquivo(null);
     } catch (error) {
       console.error("Error submitting form:", error);
+      let errorMessage = "Tente novamente mais tarde.";
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          errorMessage = "A conexão expirou. Verifique sua internet e tente novamente.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
       toast({
         title: "Erro ao enviar",
-        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
