@@ -101,69 +101,68 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
 
-    const htmlContent = `
-      <html>
-        <body style="font-family: Arial, sans-serif; background-color: #0a0a0a; color: #ffffff; padding: 20px;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: #1a1a1a; border-radius: 10px; padding: 30px; border: 1px solid #d4af37;">
-            <h1 style="color: #d4af37; text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px;">
-              Novo Pré-Cadastro - Tecnorastro
-            </h1>
-            
-            <h2 style="color: #d4af37; margin-top: 25px;">Plano Escolhido</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Plano:</td><td style="padding: 8px; border-bottom: 1px solid #333; font-weight: bold; color: #d4af37;">${formatPlano(data.plano)}</td></tr>
-              ${data.plano === "rastreamento-garantido" && data.faixaValorVeiculo ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Faixa de Valor do Veículo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatFaixaValor(data.faixaValorVeiculo)}</td></tr>` : ""}
-              ${data.plano === "rastreamento-garantido" ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Taxa de Adesão:</td><td style="padding: 8px; border-bottom: 1px solid #333;">R$ 150,00</td></tr>` : ""}
-            </table>
-            
-            <h2 style="color: #d4af37; margin-top: 25px;">Dados Pessoais</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome Completo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeCompleto)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.email)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.telefone)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CPF/CNPJ:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cpfCnpj)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">RG:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.rg)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Data de Nascimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.dataNascimento)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome da Mãe:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeMae)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome do Pai:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomePai ? escapeHtml(data.nomePai) : "Não informado"}</td></tr>
-            </table>
-            
-            <h2 style="color: #d4af37; margin-top: 25px;">Contato de Emergência</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeContatoEmergencia)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.contatoEmergencia)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vínculo com Titular:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatVinculo(data.vinculoTitular)}</td></tr>
-            </table>
-            
-            <h2 style="color: #d4af37; margin-top: 25px;">Endereço</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CEP:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cep)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Endereço:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.endereco)}, ${escapeHtml(data.numeroCasa)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Bairro:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.bairro)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Complemento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.complemento ? escapeHtml(data.complemento) : "Não informado"}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Cidade/Estado:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cidade)} - ${escapeHtml(data.estado)}</td></tr>
-            </table>
-            
-            <h2 style="color: #d4af37; margin-top: 25px;">Informações de Pagamento e Vendas</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Dia de Vencimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">Dia ${escapeHtml(data.diaVencimento)}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vendedor:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.vendedor)}</td></tr>
-            </table>
-            
-            <h2 style="color: #d4af37; margin-top: 25px;">Indicação</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Veio por indicação:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.veioPorIndicacao === "sim" ? "Sim" : "Não"}</td></tr>
-              ${data.veioPorIndicacao === "sim" && data.quemIndicou ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Quem indicou:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.quemIndicou)}</td></tr>` : ""}
-            </table>
-            
-            <p style="margin-top: 30px; padding: 15px; background-color: #2a2a2a; border-radius: 5px; font-size: 12px; color: #888;">
-              Este pré-cadastro foi enviado através do site da Tecnorastro. O cliente aceitou os termos da LGPD.
-              ${data.arquivo ? `<br><br><strong>Documento anexado:</strong> ${escapeHtml(data.arquivo.name)}` : ""}
-            </p>
-          </div>
-        </body>
-      </html>
-    `;
+    const planoInfo = data.plano === "rastreamento-garantido" && data.faixaValorVeiculo 
+      ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Faixa de Valor do Veículo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatFaixaValor(data.faixaValorVeiculo)}</td></tr>` 
+      : "";
+    const taxaAdesao = data.plano === "rastreamento-garantido" 
+      ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Taxa de Adesão:</td><td style="padding: 8px; border-bottom: 1px solid #333;">R$ 150,00</td></tr>` 
+      : "";
+    const indicacaoInfo = data.veioPorIndicacao === "sim" && data.quemIndicou 
+      ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Quem indicou:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.quemIndicou)}</td></tr>` 
+      : "";
+    const anexoInfo = data.arquivo 
+      ? `<br><br><strong>Documento anexado:</strong> ${escapeHtml(data.arquivo.name)}` 
+      : "";
+
+    const htmlContent = [
+      `<html><body style="font-family: Arial, sans-serif; background-color: #0a0a0a; color: #ffffff; padding: 20px;">`,
+      `<div style="max-width: 600px; margin: 0 auto; background-color: #1a1a1a; border-radius: 10px; padding: 30px; border: 1px solid #d4af37;">`,
+      `<h1 style="color: #d4af37; text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px;">Novo Pré-Cadastro - Tecnorastro</h1>`,
+      `<h2 style="color: #d4af37; margin-top: 25px;">Plano Escolhido</h2>`,
+      `<table style="width: 100%; border-collapse: collapse;">`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Plano:</td><td style="padding: 8px; border-bottom: 1px solid #333; font-weight: bold; color: #d4af37;">${formatPlano(data.plano)}</td></tr>`,
+      planoInfo,
+      taxaAdesao,
+      `</table>`,
+      `<h2 style="color: #d4af37; margin-top: 25px;">Dados Pessoais</h2>`,
+      `<table style="width: 100%; border-collapse: collapse;">`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome Completo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeCompleto)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.email)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.telefone)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CPF/CNPJ:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cpfCnpj)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">RG:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.rg)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Data de Nascimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.dataNascimento)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome da Mãe:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeMae)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome do Pai:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomePai ? escapeHtml(data.nomePai) : "Não informado"}</td></tr>`,
+      `</table>`,
+      `<h2 style="color: #d4af37; margin-top: 25px;">Contato de Emergência</h2>`,
+      `<table style="width: 100%; border-collapse: collapse;">`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeContatoEmergencia)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.contatoEmergencia)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vínculo com Titular:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatVinculo(data.vinculoTitular)}</td></tr>`,
+      `</table>`,
+      `<h2 style="color: #d4af37; margin-top: 25px;">Endereço</h2>`,
+      `<table style="width: 100%; border-collapse: collapse;">`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CEP:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cep)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Endereço:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.endereco)}, ${escapeHtml(data.numeroCasa)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Bairro:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.bairro)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Complemento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.complemento ? escapeHtml(data.complemento) : "Não informado"}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Cidade/Estado:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cidade)} - ${escapeHtml(data.estado)}</td></tr>`,
+      `</table>`,
+      `<h2 style="color: #d4af37; margin-top: 25px;">Informações de Pagamento e Vendas</h2>`,
+      `<table style="width: 100%; border-collapse: collapse;">`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Dia de Vencimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">Dia ${escapeHtml(data.diaVencimento)}</td></tr>`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vendedor:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.vendedor)}</td></tr>`,
+      `</table>`,
+      `<h2 style="color: #d4af37; margin-top: 25px;">Indicação</h2>`,
+      `<table style="width: 100%; border-collapse: collapse;">`,
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Veio por indicação:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.veioPorIndicacao === "sim" ? "Sim" : "Não"}</td></tr>`,
+      indicacaoInfo,
+      `</table>`,
+      `<p style="margin-top: 30px; padding: 15px; background-color: #2a2a2a; border-radius: 5px; font-size: 12px; color: #888;">Este pré-cadastro foi enviado através do site da Tecnorastro. O cliente aceitou os termos da LGPD.${anexoInfo}</p>`,
+      `</div></body></html>`
+    ].join("");
+
 
     const attachments: Attachment[] = [];
     
