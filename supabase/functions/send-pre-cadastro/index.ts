@@ -8,6 +8,8 @@ const corsHeaders = {
 };
 
 interface PreCadastroData {
+  plano: string;
+  faixaValorVeiculo?: string;
   nomeCompleto: string;
   email: string;
   telefone: string;
@@ -57,6 +59,26 @@ const handler = async (req: Request): Promise<Response> => {
       return vinculos[vinculo] || vinculo;
     };
 
+    const formatPlano = (plano: string): string => {
+      const planos: Record<string, string> = {
+        moto: "Moto - R$ 55,00/mês",
+        carro: "Carro - R$ 60,00/mês",
+        combo: "Combo - R$ 100,00/mês",
+        "rastreamento-garantido": "Rastreamento Garantido",
+      };
+      return planos[plano] || plano;
+    };
+
+    const formatFaixaValor = (faixa: string): string => {
+      const faixas: Record<string, string> = {
+        "ate-10000": "Veículos até R$ 10.000,00 - R$ 90,00/mês",
+        "ate-20000": "Veículos até R$ 20.000,00 - R$ 100,00/mês",
+        "ate-30000": "Veículos até R$ 30.000,00 - R$ 110,00/mês",
+        "ate-40000": "Veículos até R$ 40.000,00 - R$ 120,00/mês",
+      };
+      return faixas[faixa] || faixa;
+    };
+
     const client = new SMTPClient({
       connection: {
         hostname: Deno.env.get("SMTP_HOST")!,
@@ -76,6 +98,13 @@ const handler = async (req: Request): Promise<Response> => {
             <h1 style="color: #d4af37; text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px;">
               Novo Pré-Cadastro - Tecnorastro
             </h1>
+            
+            <h2 style="color: #d4af37; margin-top: 25px;">Plano Escolhido</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Plano:</td><td style="padding: 8px; border-bottom: 1px solid #333; font-weight: bold; color: #d4af37;">${formatPlano(data.plano)}</td></tr>
+              ${data.plano === "rastreamento-garantido" && data.faixaValorVeiculo ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Faixa de Valor do Veículo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatFaixaValor(data.faixaValorVeiculo)}</td></tr>` : ""}
+              ${data.plano === "rastreamento-garantido" ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Taxa de Adesão:</td><td style="padding: 8px; border-bottom: 1px solid #333;">R$ 150,00</td></tr>` : ""}
+            </table>
             
             <h2 style="color: #d4af37; margin-top: 25px;">Dados Pessoais</h2>
             <table style="width: 100%; border-collapse: collapse;">
