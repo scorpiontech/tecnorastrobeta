@@ -81,7 +81,23 @@ const validateCNPJ = (cnpj: string): boolean => {
   return true;
 };
 
+const planos = [
+  { value: "moto", label: "Moto - R$ 55,00/mês" },
+  { value: "carro", label: "Carro - R$ 60,00/mês" },
+  { value: "combo", label: "Combo - R$ 100,00/mês" },
+  { value: "rastreamento-garantido", label: "Rastreamento Garantido" },
+];
+
+const faixasValorVeiculo = [
+  { value: "ate-10000", label: "Veículos até R$ 10.000,00 - R$ 90,00/mês" },
+  { value: "ate-20000", label: "Veículos até R$ 20.000,00 - R$ 100,00/mês" },
+  { value: "ate-30000", label: "Veículos até R$ 30.000,00 - R$ 110,00/mês" },
+  { value: "ate-40000", label: "Veículos até R$ 40.000,00 - R$ 120,00/mês" },
+];
+
 const formSchema = z.object({
+  plano: z.string().min(1, "Selecione um plano"),
+  faixaValorVeiculo: z.string().optional(),
   nomeCompleto: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   email: z.string().email("Email inválido"),
   telefone: z.string().min(14, "Telefone inválido"),
@@ -120,6 +136,14 @@ const formSchema = z.object({
 }, {
   message: "Informe quem indicou (mínimo 3 caracteres)",
   path: ["quemIndicou"],
+}).refine((data) => {
+  if (data.plano === "rastreamento-garantido" && !data.faixaValorVeiculo) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Selecione a faixa de valor do veículo",
+  path: ["faixaValorVeiculo"],
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -133,6 +157,8 @@ const PreCadastro = () => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      plano: "",
+      faixaValorVeiculo: "",
       nomeCompleto: "",
       email: "",
       telefone: "",
@@ -160,6 +186,7 @@ const PreCadastro = () => {
   });
 
   const veioPorIndicacao = form.watch("veioPorIndicacao");
+  const planoSelecionado = form.watch("plano");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -386,6 +413,82 @@ const PreCadastro = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8 bg-card border border-border rounded-2xl p-6 md:p-8"
               >
+                {/* Seleção de Plano */}
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-foreground border-b border-border pb-2">
+                    Escolha seu Plano
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="plano"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Plano *</FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              if (value !== "rastreamento-garantido") {
+                                form.setValue("faixaValorVeiculo", "");
+                              }
+                            }} 
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o plano desejado" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {planos.map((plano) => (
+                                <SelectItem key={plano.value} value={plano.value}>
+                                  {plano.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {planoSelecionado === "rastreamento-garantido" && (
+                      <FormField
+                        control={form.control}
+                        name="faixaValorVeiculo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Faixa de Valor do Veículo *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a faixa de valor" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {faixasValorVeiculo.map((faixa) => (
+                                  <SelectItem key={faixa.value} value={faixa.value}>
+                                    {faixa.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {planoSelecionado === "rastreamento-garantido" && (
+                    <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                      <p className="text-sm text-foreground">
+                        <strong className="text-primary">Taxa de adesão única:</strong> R$ 150,00 (inclui instalação e ativação do programa garantido)
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 {/* Dados Pessoais */}
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold text-foreground border-b border-border pb-2">
