@@ -7,6 +7,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Função para escapar HTML e garantir texto puro
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 interface PreCadastroData {
   plano: string;
   faixaValorVeiculo?: string;
@@ -108,47 +118,47 @@ const handler = async (req: Request): Promise<Response> => {
             
             <h2 style="color: #d4af37; margin-top: 25px;">Dados Pessoais</h2>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome Completo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomeCompleto}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.email}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.telefone}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CPF/CNPJ:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.cpfCnpj}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">RG:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.rg}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Data de Nascimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.dataNascimento}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome da Mãe:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomeMae}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome do Pai:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomePai || "Não informado"}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome Completo:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeCompleto)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Email:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.email)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.telefone)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CPF/CNPJ:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cpfCnpj)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">RG:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.rg)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Data de Nascimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.dataNascimento)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome da Mãe:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeMae)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome do Pai:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomePai ? escapeHtml(data.nomePai) : "Não informado"}</td></tr>
             </table>
             
             <h2 style="color: #d4af37; margin-top: 25px;">Contato de Emergência</h2>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.nomeContatoEmergencia}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.contatoEmergencia}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Nome:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.nomeContatoEmergencia)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Telefone:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.contatoEmergencia)}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vínculo com Titular:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${formatVinculo(data.vinculoTitular)}</td></tr>
             </table>
             
             <h2 style="color: #d4af37; margin-top: 25px;">Endereço</h2>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CEP:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.cep}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Endereço:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.endereco}, ${data.numeroCasa}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Bairro:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.bairro}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Complemento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.complemento || "Não informado"}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Cidade/Estado:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.cidade} - ${data.estado}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">CEP:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cep)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Endereço:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.endereco)}, ${escapeHtml(data.numeroCasa)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Bairro:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.bairro)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Complemento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.complemento ? escapeHtml(data.complemento) : "Não informado"}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Cidade/Estado:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.cidade)} - ${escapeHtml(data.estado)}</td></tr>
             </table>
             
             <h2 style="color: #d4af37; margin-top: 25px;">Informações de Pagamento e Vendas</h2>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Dia de Vencimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">Dia ${data.diaVencimento}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vendedor:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.vendedor}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Dia de Vencimento:</td><td style="padding: 8px; border-bottom: 1px solid #333;">Dia ${escapeHtml(data.diaVencimento)}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Vendedor:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.vendedor)}</td></tr>
             </table>
             
             <h2 style="color: #d4af37; margin-top: 25px;">Indicação</h2>
             <table style="width: 100%; border-collapse: collapse;">
               <tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Veio por indicação:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.veioPorIndicacao === "sim" ? "Sim" : "Não"}</td></tr>
-              ${data.veioPorIndicacao === "sim" && data.quemIndicou ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Quem indicou:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${data.quemIndicou}</td></tr>` : ""}
+              ${data.veioPorIndicacao === "sim" && data.quemIndicou ? `<tr><td style="padding: 8px; border-bottom: 1px solid #333; color: #888;">Quem indicou:</td><td style="padding: 8px; border-bottom: 1px solid #333;">${escapeHtml(data.quemIndicou)}</td></tr>` : ""}
             </table>
             
             <p style="margin-top: 30px; padding: 15px; background-color: #2a2a2a; border-radius: 5px; font-size: 12px; color: #888;">
               Este pré-cadastro foi enviado através do site da Tecnorastro. O cliente aceitou os termos da LGPD.
-              ${data.arquivo ? `<br><br><strong>Documento anexado:</strong> ${data.arquivo.name}` : ""}
+              ${data.arquivo ? `<br><br><strong>Documento anexado:</strong> ${escapeHtml(data.arquivo.name)}` : ""}
             </p>
           </div>
         </body>
@@ -171,7 +181,7 @@ const handler = async (req: Request): Promise<Response> => {
     await client.send({
       from: Deno.env.get("SMTP_USER")!,
       to: "contato@tecnorastro.net.br",
-      subject: `Novo Pré-Cadastro: ${data.nomeCompleto}`,
+      subject: `Novo Pré-Cadastro: ${escapeHtml(data.nomeCompleto)}`,
       html: htmlContent,
       attachments: attachments.length > 0 ? attachments : undefined,
     });
