@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import PreCadastro from "./pages/PreCadastro";
 import Planos from "./pages/Planos";
 import RastreamentoGarantido from "./pages/RastreamentoGarantido";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import TermosDeUso from "./pages/TermosDeUso";
+import LGPD from "./pages/LGPD";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
@@ -23,6 +26,9 @@ const App = () => (
           <Route path="/pre-cadastro" element={<PreCadastro />} />
           <Route path="/planos" element={<Planos />} />
           <Route path="/rastreamento-garantido" element={<RastreamentoGarantido />} />
+          <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
+          <Route path="/termos-de-uso" element={<TermosDeUso />} />
+          <Route path="/lgpd" element={<LGPD />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

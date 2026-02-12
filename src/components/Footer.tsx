@@ -93,14 +93,18 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-4 text-foreground">Legal</h4>
             <ul className="space-y-3">
-              {["Política de Privacidade", "Termos de Uso", "Cookies", "LGPD"].map((link) => (
-                <li key={link}>
-                  <a
-                    href="#"
+              {[
+                { name: "Política de Privacidade", href: "/politica-de-privacidade" },
+                { name: "Termos de Uso", href: "/termos-de-uso" },
+                { name: "LGPD", href: "/lgpd" },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
                     className="text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
-                    {link}
-                  </a>
+                    {link.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -113,7 +117,15 @@ const Footer = () => {
             © {currentYear} Tecnorastro. Todos os direitos reservados.
           </p>
           <p className="text-muted-foreground text-sm">
-            CNPJ: 00.000.000/0001-00
+            Desenvolvido por{" "}
+            <a
+              href="https://gtechsolucoesti.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Gtech Soluções Tecnológicas
+            </a>
           </p>
         </div>
       </div>
