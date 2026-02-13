@@ -168,7 +168,7 @@ const handler = async (req: Request): Promise<Response> => {
           console.error("Storage upload error:", uploadError);
           anexoInfo = `<br><br><strong>Documento:</strong> ${escapeHtml(data.arquivo.name)} (falha no upload)`;
         } else {
-          const { data: urlData } = supabase.storage
+          const { data: urlData } = await supabase.storage
             .from("pre-cadastro-docs")
             .createSignedUrl(filePath, 60 * 60 * 24 * 30); // 30 days
 
