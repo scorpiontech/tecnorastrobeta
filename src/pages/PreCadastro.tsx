@@ -310,7 +310,7 @@ const PreCadastro = () => {
       });
 
       form.reset();
-      setArquivo(null);
+      setArquivos([]);
     } catch (error) {
       console.error("Error submitting form:", error);
       let errorMessage = "Tente novamente mais tarde.";
