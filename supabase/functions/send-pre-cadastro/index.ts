@@ -16,6 +16,12 @@ const escapeHtml = (text: string): string => {
     .replace(/'/g, "&#039;");
 };
 
+interface ArquivoData {
+  name: string;
+  type: string;
+  data: string;
+}
+
 interface PreCadastroData {
   plano: string;
   faixaValorVeiculo?: string;
@@ -41,11 +47,9 @@ interface PreCadastroData {
   vendedor: string;
   veioPorIndicacao: string;
   quemIndicou?: string;
-  arquivo?: {
-    name: string;
-    type: string;
-    data: string;
-  };
+  // Support both single (legacy) and multiple files
+  arquivo?: ArquivoData;
+  arquivos?: ArquivoData[];
 }
 
 const formatVinculo = (vinculo: string): string => {
@@ -134,6 +138,42 @@ const buildEmailHtml = (data: PreCadastroData, anexoInfo: string): string => {
   ].join("");
 };
 
+const uploadFile = async (
+  supabase: ReturnType<typeof createClient>,
+  arquivo: ArquivoData
+): Promise<string> => {
+  try {
+    const binaryData = Uint8Array.from(atob(arquivo.data), c => c.charCodeAt(0));
+    const timestamp = Date.now();
+    const safeName = arquivo.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filePath = `${timestamp}_${safeName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("pre-cadastro-docs")
+      .upload(filePath, binaryData, {
+        contentType: arquivo.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Storage upload error:", uploadError);
+      return `<br>• ${escapeHtml(arquivo.name)} (falha no upload)`;
+    }
+
+    const { data: urlData } = await supabase.storage
+      .from("pre-cadastro-docs")
+      .createSignedUrl(filePath, 60 * 60 * 24 * 30); // 30 days
+
+    if (urlData?.signedUrl) {
+      return `<br>• <a href="${urlData.signedUrl}" style="color: #d4af37;">${escapeHtml(arquivo.name)}</a>`;
+    }
+    return `<br>• ${escapeHtml(arquivo.name)} (salvo: ${escapeHtml(filePath)})`;
+  } catch (err) {
+    console.error("Upload error for", arquivo.name, err);
+    return `<br>• ${escapeHtml(arquivo.name)} (erro ao salvar)`;
+  }
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -144,48 +184,27 @@ const handler = async (req: Request): Promise<Response> => {
 
     let anexoInfo = "";
 
-    // Upload file to storage instead of attaching to email
-    if (data.arquivo) {
-      try {
-        const supabase = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-        );
-
-        const binaryData = Uint8Array.from(atob(data.arquivo.data), c => c.charCodeAt(0));
-        const timestamp = Date.now();
-        const safeName = data.arquivo.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const filePath = `${timestamp}_${safeName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("pre-cadastro-docs")
-          .upload(filePath, binaryData, {
-            contentType: data.arquivo.type,
-            upsert: false,
-          });
-
-        if (uploadError) {
-          console.error("Storage upload error:", uploadError);
-          anexoInfo = `<br><br><strong>Documento:</strong> ${escapeHtml(data.arquivo.name)} (falha no upload)`;
-        } else {
-          const { data: urlData } = await supabase.storage
-            .from("pre-cadastro-docs")
-            .createSignedUrl(filePath, 60 * 60 * 24 * 30); // 30 days
-
-          if (urlData?.signedUrl) {
-            anexoInfo = `<br><br><strong>Documento anexado:</strong> <a href="${urlData.signedUrl}" style="color: #d4af37;">${escapeHtml(data.arquivo.name)}</a>`;
-          } else {
-            anexoInfo = `<br><br><strong>Documento:</strong> ${escapeHtml(data.arquivo.name)} (salvo no storage: ${escapeHtml(filePath)})`;
-          }
-        }
-      } catch (storageErr) {
-        console.error("Storage error:", storageErr);
-        anexoInfo = `<br><br><strong>Documento:</strong> ${escapeHtml(data.arquivo.name)} (erro ao salvar)`;
-      }
-
-      // Free memory - remove base64 data
-      delete data.arquivo;
+    // Normalize: support both single arquivo (legacy) and multiple arquivos
+    const files: ArquivoData[] = [];
+    if (data.arquivos && data.arquivos.length > 0) {
+      files.push(...data.arquivos);
+    } else if (data.arquivo) {
+      files.push(data.arquivo);
     }
+
+    if (files.length > 0) {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+
+      const results = await Promise.all(files.map(f => uploadFile(supabase, f)));
+      anexoInfo = `<br><br><strong>Documentos anexados (${files.length}):</strong>${results.join("")}`;
+    }
+
+    // Free memory
+    delete data.arquivo;
+    delete data.arquivos;
 
     const htmlContent = buildEmailHtml(data, anexoInfo);
 

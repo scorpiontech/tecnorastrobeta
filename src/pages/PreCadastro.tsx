@@ -833,48 +833,53 @@ const PreCadastro = () => {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label>Anexar Documento do Veículo (PDF ou Imagem) *</Label>
-                      <div className="relative">
-                        {!arquivo ? (
-                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-background">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                              <p className="text-sm text-muted-foreground">
-                                <span className="font-semibold text-primary">Clique para enviar</span> ou arraste
-                              </p>
-                              <p className="text-xs text-muted-foreground">PDF, JPEG ou PNG (máx. 5MB)</p>
-                            </div>
-                            <input
-                              type="file"
-                              className="hidden"
-                              accept=".pdf,.jpg,.jpeg,.png"
-                              onChange={handleFileChange}
-                            />
-                          </label>
-                        ) : (
-                          <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-background">
-                            <div className="flex items-center gap-3">
-                              {arquivo.type === "application/pdf" ? (
-                                <FileText className="w-8 h-8 text-primary" />
-                              ) : (
-                                <Image className="w-8 h-8 text-primary" />
-                              )}
-                              <div>
-                                <p className="text-sm font-medium text-foreground truncate max-w-[200px]">
-                                  {arquivo.name}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {(arquivo.size / 1024 / 1024).toFixed(2)} MB
-                                </p>
+                      <Label>Anexar Documentos do Veículo (PDF ou Imagem) * <span className="text-xs text-muted-foreground">(máx. 5 arquivos)</span></Label>
+                      <div className="relative space-y-3">
+                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors bg-background">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">
+                              <span className="font-semibold text-primary">Clique para enviar</span> ou arraste
+                            </p>
+                            <p className="text-xs text-muted-foreground">PDF, JPEG ou PNG (máx. 5MB cada)</p>
+                          </div>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            multiple
+                            onChange={handleFileChange}
+                          />
+                        </label>
+
+                        {arquivos.length > 0 && (
+                          <div className="space-y-2">
+                            {arquivos.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg bg-background">
+                                <div className="flex items-center gap-3">
+                                  {file.type === "application/pdf" ? (
+                                    <FileText className="w-6 h-6 text-primary flex-shrink-0" />
+                                  ) : (
+                                    <Image className="w-6 h-6 text-primary flex-shrink-0" />
+                                  )}
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground truncate max-w-[200px]">
+                                      {file.name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    </p>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeFile(index)}
+                                  className="p-1 hover:bg-muted rounded-full transition-colors"
+                                >
+                                  <X className="w-5 h-5 text-muted-foreground hover:text-destructive" />
+                                </button>
                               </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={removeFile}
-                              className="p-1 hover:bg-muted rounded-full transition-colors"
-                            >
-                              <X className="w-5 h-5 text-muted-foreground hover:text-destructive" />
-                            </button>
+                            ))}
                           </div>
                         )}
                       </div>
