@@ -150,7 +150,7 @@ type FormData = z.infer<typeof formSchema>;
 
 const PreCadastro = () => {
   const { toast } = useToast();
-  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [arquivos, setArquivos] = useState<File[]>([]);
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [enviando, setEnviando] = useState(false);
 
