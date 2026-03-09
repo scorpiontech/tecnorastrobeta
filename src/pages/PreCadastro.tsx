@@ -189,31 +189,49 @@ const PreCadastro = () => {
   const planoSelecionado = form.watch("plano");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const validTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+    const files = e.target.files;
+    if (!files) return;
+    
+    const validTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+    const newFiles: File[] = [];
+    
+    for (const file of Array.from(files)) {
       if (!validTypes.includes(file.type)) {
         toast({
           title: "Arquivo inválido",
-          description: "Por favor, envie apenas arquivos PDF ou JPEG/PNG.",
+          description: `"${file.name}" não é um formato válido. Envie apenas PDF ou JPEG/PNG.`,
           variant: "destructive",
         });
-        return;
+        continue;
       }
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Arquivo muito grande",
-          description: "O arquivo deve ter no máximo 5MB.",
+          description: `"${file.name}" excede o limite de 5MB.`,
           variant: "destructive",
         });
-        return;
+        continue;
       }
-      setArquivo(file);
+      newFiles.push(file);
     }
+
+    const total = arquivos.length + newFiles.length;
+    if (total > 5) {
+      toast({
+        title: "Limite de arquivos",
+        description: "Você pode anexar no máximo 5 arquivos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setArquivos(prev => [...prev, ...newFiles]);
+    // Reset input to allow selecting the same file again
+    e.target.value = "";
   };
 
-  const removeFile = () => {
-    setArquivo(null);
+  const removeFile = (index: number) => {
+    setArquivos(prev => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = async (data: FormData) => {
