@@ -235,10 +235,10 @@ const PreCadastro = () => {
   };
 
   const onSubmit = async (data: FormData) => {
-    if (!arquivo) {
+    if (arquivos.length === 0) {
       toast({
         title: "Arquivo obrigatório",
-        description: "Por favor, anexe um documento (PDF ou imagem).",
+        description: "Por favor, anexe pelo menos um documento (PDF ou imagem).",
         variant: "destructive",
       });
       return;
