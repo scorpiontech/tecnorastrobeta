@@ -262,15 +262,17 @@ const PreCadastro = () => {
         });
       };
 
-      const arquivoBase64 = await fileToBase64(arquivo);
+      const arquivosPayload = await Promise.all(
+        arquivos.map(async (file) => ({
+          name: file.name,
+          type: file.type,
+          data: await fileToBase64(file),
+        }))
+      );
 
       const payload = {
         ...data,
-        arquivo: {
-          name: arquivo.name,
-          type: arquivo.type,
-          data: arquivoBase64,
-        },
+        arquivos: arquivosPayload,
       };
 
       const controller = new AbortController();
