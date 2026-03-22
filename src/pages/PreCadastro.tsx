@@ -926,6 +926,7 @@ const PreCadastro = () => {
                               <SelectItem value="Wenicios Santos">Wenicios Santos</SelectItem>
                               <SelectItem value="Ingridy Silva">Ingridy Silva</SelectItem>
                               <SelectItem value="Luiz Felipe">Luiz Felipe</SelectItem>
+                              <SelectItem value="Ryan Gonçalves">Ryan Gonçalves</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
